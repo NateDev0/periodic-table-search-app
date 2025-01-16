@@ -511,12 +511,60 @@
     }
 
     async function searchElement() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
+      const query = document.getElementById("searchInput").value;
       const answerContainer = document.getElementById("answerContainer");
       const loadingDiv = document.querySelector(".loading");
       
-      // Parse the chemical name first
-      const parsedQuery = parseChemicalName(query);
+      // Check if it looks like a homework question (contains multiple lines or specific keywords)
+      if (query.includes('\n') || 
+          query.toLowerCase().includes('write') || 
+          query.toLowerCase().includes('name') || 
+          query.toLowerCase().includes('formula')) {
+        
+        try {
+          // Create a more specific prompt for homework questions
+          const homeworkPrompt = `As a chemistry tutor, please solve this question with detailed explanations:
+          
+          ${query}
+          
+          Show all steps and include the correct answers.`;
+
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: "gpt-4-turbo-preview",
+              messages: [{
+                role: "user",
+                content: homeworkPrompt
+              }],
+              temperature: 0.7
+            })
+          });
+
+          const data = await response.json();
+          const answer = data.choices[0].message.content;
+
+          // Log the answer to console with formatting
+          console.log('%c Chemistry Homework Helper 📚', 'font-size: 14px; font-weight: bold; color: #2ecc71;');
+          console.log('%c Question:', 'font-weight: bold; color: #3498db;');
+          console.log(query);
+          console.log('%c Answer:', 'font-weight: bold; color: #e74c3c;');
+          console.log(answer);
+          
+          // Still do the normal element search
+          const parsedQuery = parseChemicalName(query.toLowerCase());
+          // ... rest of the existing search code ...
+        } catch (error) {
+          console.error('Error getting homework help:', error);
+        }
+      }
+      
+      // Continue with the regular element search...
+      const parsedQuery = parseChemicalName(query.toLowerCase());
       
       // Reset all highlights
       document.querySelectorAll(".element").forEach(el => el.classList.remove("highlight"));
@@ -636,3 +684,4 @@
   </script>
 </body>
 </html>
+
