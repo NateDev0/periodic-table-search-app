@@ -115,6 +115,39 @@
       display: none;
       margin: 20px auto;
     }
+    .legend {
+      margin: 20px auto;
+      max-width: 800px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: white;
+    }
+
+    .legend h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      justify-items: start;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color-box {
+      width: 20px;
+      height: 20px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
@@ -122,6 +155,51 @@
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search by symbol or name...">
     <button onclick="searchElement()">Search</button>
+  </div>
+  <div class="legend">
+    <h3>Element Types</h3>
+    <div class="legend-grid">
+      <div class="legend-item">
+        <span class="color-box nonmetal"></span>
+        <span>Nonmetal</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box metal"></span>
+        <span>Metal</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box metalloid"></span>
+        <span>Metalloid</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box noble-gas"></span>
+        <span>Noble Gas</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box halogen"></span>
+        <span>Halogen</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box alkali-metal"></span>
+        <span>Alkali Metal</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box alkaline-earth-metal"></span>
+        <span>Alkaline Earth Metal</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box transition-metal"></span>
+        <span>Transition Metal</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box lanthanide"></span>
+        <span>Lanthanide</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-box actinide"></span>
+        <span>Actinide</span>
+      </div>
+    </div>
   </div>
   <div class="loading">Searching for answer...</div>
   <div id="answerContainer" class="answer-container"></div>
@@ -419,3 +497,4 @@
   </script>
 </body>
 </html>
+
