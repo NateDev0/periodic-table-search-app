@@ -389,23 +389,119 @@
       addSpacer(2, i);
     }
 
+    function parseChemicalName(query) {
+      // Remove whitespace and convert to lowercase
+      query = query.toLowerCase().trim();
+      
+      // Common suffixes to remove
+      const suffixes = ['ide', 'ate', 'ite', 'ic', 'ous', 'hydride'];
+      
+      // Common prefixes to remove
+      const prefixes = ['mono', 'di', 'tri', 'tetra', 'penta', 'hexa', 'hepta', 'octa', 'nona', 'deca'];
+      
+      // Roman numerals to remove
+      const romanNumerals = ['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)', '(vii)', '(viii)', '(ix)', '(x)'];
+      
+      // Element name mappings for special cases
+      const specialCases = {
+        'ferrous': 'iron',
+        'ferric': 'iron',
+        'cuprous': 'copper',
+        'cupric': 'copper',
+        'plumbous': 'lead',
+        'plumbic': 'lead',
+        'stannic': 'tin',
+        'stannous': 'tin',
+        'aurous': 'gold',
+        'auric': 'gold',
+        'argentous': 'silver',
+        'argentic': 'silver'
+      };
+
+      // Check for special cases first
+      for (let [special, element] of Object.entries(specialCases)) {
+        if (query.includes(special)) {
+          return element;
+        }
+      }
+
+      // Remove suffixes
+      for (let suffix of suffixes) {
+        if (query.endsWith(suffix)) {
+          query = query.slice(0, -suffix.length);
+          break;
+        }
+      }
+
+      // Remove prefixes
+      for (let prefix of prefixes) {
+        if (query.startsWith(prefix)) {
+          query = query.slice(prefix.length);
+          break;
+        }
+      }
+
+      // Remove roman numerals
+      for (let numeral of romanNumerals) {
+        query = query.replace(numeral, '');
+      }
+
+      // Element name mappings
+      const elementMappings = {
+        'sulfur': 'sulfur',
+        'sulphur': 'sulfur',
+        'sodium': 'sodium',
+        'natrium': 'sodium',
+        'potassium': 'potassium',
+        'kalium': 'potassium',
+        'iron': 'iron',
+        'ferrum': 'iron',
+        'copper': 'copper',
+        'cuprum': 'copper',
+        'silver': 'silver',
+        'argentum': 'silver',
+        'gold': 'gold',
+        'aurum': 'gold',
+        'mercury': 'mercury',
+        'hydrargyrum': 'mercury',
+        'lead': 'lead',
+        'plumbum': 'lead',
+        'tin': 'tin',
+        'stannum': 'tin'
+      };
+
+      // Clean up the query
+      query = query.trim();
+
+      // Return the mapped element name or the cleaned query
+      return elementMappings[query] || query;
+    }
+
     async function searchElement() {
       const query = document.getElementById("searchInput").value.toLowerCase();
       const answerContainer = document.getElementById("answerContainer");
       const loadingDiv = document.querySelector(".loading");
       
+      // Parse the chemical name first
+      const parsedQuery = parseChemicalName(query);
+      
       // First check if it's a simple element search
-      const elementSearch = document.querySelectorAll(".element").forEach(el => {
+      let elementFound = false;
+      document.querySelectorAll(".element").forEach(el => {
         el.classList.remove("highlight");
-        if (el.dataset.symbol.toLowerCase() === query || el.dataset.name.toLowerCase() === query) {
+        if (el.dataset.symbol.toLowerCase() === parsedQuery || 
+            el.dataset.name.toLowerCase() === parsedQuery) {
           el.classList.add("highlight");
           answerContainer.style.display = "none";
-          return;
+          elementFound = true;
+          
+          // Scroll element into view
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       });
 
-      // If it looks like a question (more than 3 words), treat it as a chemistry question
-      if (query.split(" ").length > 3) {
+      // If no element was found and it looks like a question, use the AI
+      if (!elementFound && query.split(" ").length > 3) {
         try {
           loadingDiv.style.display = "block";
           answerContainer.style.display = "none";
@@ -497,4 +593,3 @@
   </script>
 </body>
 </html>
-
