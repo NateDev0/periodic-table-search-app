@@ -30,11 +30,12 @@
       cursor: pointer;
       transition: transform 0.2s;
       position: relative;
-      min-height: 85px;
+      min-height: 90px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      gap: 2px;
     }
     .element:hover {
       transform: scale(1.1);
@@ -53,27 +54,31 @@
     .element .symbol {
       font-size: 18px;
       font-weight: bold;
-      margin: 2px 0;
+      margin: 0;
     }
     .element .name {
-      font-size: 10px;
-      margin: 2px 0;
+      font-size: 9px;
+      margin: 0;
     }
     .element .atomic-number {
       font-size: 10px;
       color: #444;
       align-self: flex-start;
+      margin: 0;
     }
     .element .atomic-mass {
       font-size: 9px;
       color: #666;
-      margin-top: 2px;
+      margin: 0;
     }
     .element .ion-charge {
       font-size: 9px;
       color: #666;
-      margin-top: 2px;
+      margin-top: auto;
       min-height: 12px;
+      padding: 1px 0;
+      width: 100%;
+      border-top: 1px dotted #ddd;
     }
     /* Element type colors */
     .nonmetal { background-color: lightgreen; }
@@ -285,7 +290,7 @@
         <span class="symbol">${element.symbol}</span>
         <span class="name">${element.name}</span>
         <span class="atomic-mass">${element.atomicMass}</span>
-        <span class="ion-charge">${getIonCharges(element.symbol)}</span>
+        <span class="ion-charge">${getIonCharges(element.symbol) || '—'}</span>
       `;
       periodicTable.appendChild(div);
     });
