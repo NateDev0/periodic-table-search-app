@@ -148,6 +148,21 @@
       border: 1px solid #ccc;
       border-radius: 3px;
     }
+
+    .highlight-legend {
+      background-color: rgba(255, 255, 0, 0.3);
+      border-radius: 5px;
+      padding: 5px;
+      transform: scale(1.1);
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .legend-item {
+      padding: 5px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
   </style>
 </head>
 <body>
@@ -393,16 +408,34 @@
       // Remove whitespace and convert to lowercase
       query = query.toLowerCase().trim();
       
-      // Common suffixes to remove
-      const suffixes = ['ide', 'ate', 'ite', 'ic', 'ous', 'hydride'];
+      // Common compound mappings
+      const compoundMappings = {
+        'oxide': 'oxygen',
+        'sulfide': 'sulfur',
+        'sulphide': 'sulfur',
+        'chloride': 'chlorine',
+        'bromide': 'bromine',
+        'iodide': 'iodine',
+        'fluoride': 'fluorine',
+        'nitride': 'nitrogen',
+        'phosphide': 'phosphorus',
+        'carbide': 'carbon',
+        'hydride': 'hydrogen'
+      };
+
+      // Check compound names first
+      for (let [compound, element] of Object.entries(compoundMappings)) {
+        if (query.includes(compound)) {
+          return element;
+        }
+      }
       
-      // Common prefixes to remove
+      // Rest of the existing code...
+      const suffixes = ['ide', 'ate', 'ite', 'ic', 'ous'];
       const prefixes = ['mono', 'di', 'tri', 'tetra', 'penta', 'hexa', 'hepta', 'octa', 'nona', 'deca'];
-      
-      // Roman numerals to remove
       const romanNumerals = ['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)', '(vii)', '(viii)', '(ix)', '(x)'];
       
-      // Element name mappings for special cases
+      // Special cases
       const specialCases = {
         'ferrous': 'iron',
         'ferric': 'iron',
@@ -418,7 +451,7 @@
         'argentic': 'silver'
       };
 
-      // Check for special cases first
+      // Check special cases
       for (let [special, element] of Object.entries(specialCases)) {
         if (query.includes(special)) {
           return element;
@@ -485,15 +518,25 @@
       // Parse the chemical name first
       const parsedQuery = parseChemicalName(query);
       
+      // Reset all highlights
+      document.querySelectorAll(".element").forEach(el => el.classList.remove("highlight"));
+      document.querySelectorAll(".legend-item").forEach(item => item.classList.remove("highlight-legend"));
+      
       // First check if it's a simple element search
       let elementFound = false;
       document.querySelectorAll(".element").forEach(el => {
-        el.classList.remove("highlight");
         if (el.dataset.symbol.toLowerCase() === parsedQuery || 
             el.dataset.name.toLowerCase() === parsedQuery) {
           el.classList.add("highlight");
           answerContainer.style.display = "none";
           elementFound = true;
+          
+          // Get the element type and highlight it in the legend
+          const elementType = el.className.split(' ')[1]; // Get the type class
+          const legendItem = document.querySelector(`.legend-item:has(.color-box.${elementType})`);
+          if (legendItem) {
+            legendItem.classList.add("highlight-legend");
+          }
           
           // Scroll element into view
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
