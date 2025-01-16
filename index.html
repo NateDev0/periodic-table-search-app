@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Periodic Table Search</title>
+  <script src="https://cdn.jsdelivr.net/npm/openai@4.0.0/dist/openai.min.js"></script>
+  <script src="config.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -79,6 +81,20 @@
     .actinide-row {
       margin-top: 10px;
     }
+    .answer-container {
+      margin: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      max-width: 600px;
+      margin: 20px auto;
+      display: none;
+    }
+    
+    .loading {
+      display: none;
+      margin: 20px auto;
+    }
   </style>
 </head>
 <body>
@@ -87,6 +103,8 @@
     <input type="text" id="searchInput" placeholder="Search by symbol or name...">
     <button onclick="searchElement()">Search</button>
   </div>
+  <div class="loading">Searching for answer...</div>
+  <div id="answerContainer" class="answer-container"></div>
   <div class="periodic-table" id="periodicTable"></div>
 
   <script>
@@ -272,15 +290,53 @@
       addSpacer(2, i);
     }
 
-    function searchElement() {
+    async function searchElement() {
       const query = document.getElementById("searchInput").value.toLowerCase();
-      document.querySelectorAll(".element").forEach(el => {
+      const answerContainer = document.getElementById("answerContainer");
+      const loadingDiv = document.querySelector(".loading");
+      
+      // First check if it's a simple element search
+      const elementSearch = document.querySelectorAll(".element").forEach(el => {
         el.classList.remove("highlight");
         if (el.dataset.symbol.toLowerCase() === query || el.dataset.name.toLowerCase() === query) {
           el.classList.add("highlight");
+          answerContainer.style.display = "none";
+          return;
         }
       });
+
+      // If it looks like a question (more than 3 words), treat it as a chemistry question
+      if (query.split(" ").length > 3) {
+        try {
+          loadingDiv.style.display = "block";
+          answerContainer.style.display = "none";
+
+          const answer = await askChemistryQuestion(query);
+
+          answerContainer.innerHTML = `
+            <h3>Answer:</h3>
+            <p>${answer}</p>
+          `;
+          answerContainer.style.display = "block";
+        } catch (error) {
+          answerContainer.innerHTML = `
+            <p style="color: red;">Sorry, I couldn't process that question. Please try again.</p>
+          `;
+          answerContainer.style.display = "block";
+        } finally {
+          loadingDiv.style.display = "none";
+        }
+      }
     }
+
+    // Add event listener for Enter key
+    document.getElementById("searchInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        searchElement();
+      }
+    });
   </script>
 </body>
 </html>
+
