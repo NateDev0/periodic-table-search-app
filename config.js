@@ -1,5 +1,5 @@
 const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;  // Get this from your .env file
+const OPENAI_API_KEY = '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';
 
 async function askChemistryQuestion(question) {
     try {
@@ -10,13 +10,13 @@ async function askChemistryQuestion(question) {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`
             },
             body: JSON.stringify({
-                model: "gpt-4-turbo-preview",  // Using GPT-4 for better chemistry knowledge
+                model: "gpt-3.5-turbo",
                 messages: [{
                     role: "user",
                     content: `You are a chemistry expert. Please answer this question concisely and accurately: ${question}`
                 }],
                 max_tokens: 150,
-                temperature: 0.3  // Lower temperature for more precise answers
+                temperature: 0.3
             })
         });
         const data = await response.json();
